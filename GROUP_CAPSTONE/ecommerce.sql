@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 21, 2025 at 08:17 AM
+-- Generation Time: Mar 21, 2025 at 06:27 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,6 +47,24 @@ CREATE TABLE `Cart` (
   `product_id` int(11) NOT NULL,
   `quantity` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `Cart`
+--
+
+INSERT INTO `Cart` (`cart_id`, `user_id`, `product_id`, `quantity`) VALUES
+(57, 1, 1, 19),
+(58, 1, 2, 13),
+(59, 1, 3, 12),
+(60, 1, 4, 20),
+(63, 4, 1, 1),
+(64, 4, 2, 1),
+(65, 4, 3, 1),
+(66, 4, 4, 2),
+(67, 4, 5, 2),
+(68, 4, 6, 2),
+(72, 4, 7, 1),
+(73, 4, 8, 1);
 
 -- --------------------------------------------------------
 
@@ -92,6 +110,21 @@ CREATE TABLE `Products` (
   `price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `Products`
+--
+
+INSERT INTO `Products` (`Product_ID`, `Product_Name`, `Product_Desc`, `picture`, `price`) VALUES
+(1, 'Beautiful White Dress', 'Beautiful White dress, perfect for any occasions.', 'static/img/product-1.jpg', 123.00),
+(2, 'Jackets for teens', 'Jacket for teens, perfect for passion', 'static/img/product-2.jpg', 123.00),
+(3, 'Scarf for men', 'Scarf for men, perfect for flexing. If you\'re handsome you\'ll buy one.', 'static/img/product-3.jpg', 200.00),
+(4, 'Black sleeves mini dress', 'Perfect if you want to flex your beauty.', 'static/img/product-4.jpg', 150.00),
+(5, 'Multi-colored t-shirt', 'Can be used for events', 'static/img/product-5.jpg', 50.00),
+(6, 'Groom suit', 'Perfect for wedding events, flexing and for handsome men.', 'static/img/product-6.jpg', 1000.00),
+(7, 'Girl Fasion Suit', 'Perfect for showcasing your beauty for everyone.', 'static/img/product-7.jpg', 250.00),
+(8, 'Soffny Boy Plain', 'Great for kids.', 'static/img/product-8.jpg', 150.00),
+(9, 'Jacket for women', 'Perfect for flexing your beauty.', 'static/img/product-9.jpg', 400.00);
+
 -- --------------------------------------------------------
 
 --
@@ -114,7 +147,8 @@ CREATE TABLE `Users` (
 --
 
 INSERT INTO `Users` (`Cust_ID`, `Last_Name`, `First_Name`, `Gender`, `Phone_number`, `UserName`, `Email`, `Password`) VALUES
-(1, 'jayme', 'selwyn', 'Male', '3242', 'gwapo', 'gwapo@gmail.com', 'gwapo');
+(1, 'jayme', 'selwyn', 'Male', '3242', 'gwapo', 'gwapo@gmail.com', 'gwapo'),
+(4, 'pinakagwapo', 'Gwapo ako', 'Male', '09693052186', 'gwapoako', 'gwapoako@gmail.com', 'gwapoako');
 
 --
 -- Indexes for dumped tables
@@ -132,7 +166,7 @@ ALTER TABLE `Admins`
 --
 ALTER TABLE `Cart`
   ADD PRIMARY KEY (`cart_id`),
-  ADD KEY `user_id` (`user_id`),
+  ADD UNIQUE KEY `unique_user_product` (`user_id`,`product_id`),
   ADD KEY `product_id` (`product_id`);
 
 --
@@ -177,7 +211,7 @@ ALTER TABLE `Admins`
 -- AUTO_INCREMENT for table `Cart`
 --
 ALTER TABLE `Cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT for table `Contacts`
@@ -195,13 +229,13 @@ ALTER TABLE `Order_info`
 -- AUTO_INCREMENT for table `Products`
 --
 ALTER TABLE `Products`
-  MODIFY `Product_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Product_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `Cust_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `Cust_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables

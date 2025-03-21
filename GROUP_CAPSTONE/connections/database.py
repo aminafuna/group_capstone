@@ -78,7 +78,7 @@ def Products():
     conn = db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, name, description, price, stock, picture FROM products")
+        cursor.execute("SELECT Product_ID, Product_Name, Product_Desc, picture, price FROM Products")
         products = cursor.fetchall()
     
         for product in products:
@@ -166,4 +166,3 @@ def remove_from_cart(item_id):
     finally:
         cursor.close()
         conn.close()
-
