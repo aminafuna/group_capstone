@@ -48,8 +48,7 @@ def Cart():
         result = Display_All(email)
         return render_template("cart.html", cart_items=cart_items, result = result)
     else:
-        return redirect(url_for("login"))
-
+        return redirect(url_for("Login"))
 
 @app.route("/profile")
 def Profile():
@@ -59,10 +58,6 @@ def Profile():
         return render_template("profile.html", result = result)
     else:
         return redirect(url_for('Login')) 
-
-
-
-
 
 @app.route("/SIGNIN", methods=["GET", "POST"])
 def SIGNIN():
