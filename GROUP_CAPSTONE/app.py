@@ -325,16 +325,157 @@ def add_to_cart():
     except Exception as e:
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
-
-@app.route("/checkout", methods = ['POST', 'GET'])
+@app.route("/checkout")
 def checkout():
-    if 'email' in session:
-        return render_template("checkout.html")
-    else:
+    if "email" not in session:
+        return redirect(url_for("Login"))
+    
+    try:
+        user_data = Get_userid(session["email"])
+        
+        conn = db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cart_sql = """
+        SELECT Cart.cart_id, Cart.user_id, Cart.product_id, Cart.quantity,
+        Products.Product_Name, Products.price, Products.picture,
+        (Cart.quantity * Products.price) as total_price
+        FROM Cart
+        JOIN Products ON Cart.product_id = Products.Product_ID
+        WHERE Cart.user_id = %s
+        """
+        cursor.execute(cart_sql, (user_data['Cust_ID'],))
+        cart_items = cursor.fetchall()
+        
+        subtotal = sum(item['total_price'] for item in cart_items)
+        shipping = 10 if cart_items else 0
+        total = subtotal + shipping
+        
+        cursor.close()
+        conn.close()
+        
+        print("User Data:", user_data)
+        print("Cart Items:", cart_items)
+        
+        return render_template("checkout.html", 
+                               user=user_data, 
+                               cart_items=cart_items, 
+                               subtotal=subtotal, 
+                               shipping=shipping, 
+                               total=total)
+    
+    except Exception as e:
+        print(f"Error loading checkout page: {e}")
+        return f"An error occurred while loading the checkout page: {e}", 500
+
+@app.route("/place_order", methods=['POST'])
+def place_order():
+    if "email" not in session:
         return redirect(url_for("LOGIN"))
+    try:
+        user_data = Get_userid(session["email"])
+        user_id = user_data['Cust_ID']
+        
+        username = request.form.get('Username') or user_data.get('Username')
+        
+        first_name = request.form.get('firstName')
+        last_name = request.form.get('lastName')
+        email = request.form.get('email')
+        mobile = request.form.get('mobile')
+        address_line1 = request.form.get('addressLine1')
+        address_line2 = request.form.get('addressLine2')
+        country = request.form.get('country')
+        city = request.form.get('city')
+        state = request.form.get('state')
+        zip_code = request.form.get('zipCode')
+        payment_method = request.form.get('payment')
+        
+        delivery_address = f"{address_line1}, {address_line2}, {city}, {state}, {country}, {zip_code}"
+        
+        conn = db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cart_sql = """
+        SELECT Cart.cart_id, Cart.user_id, Cart.product_id, Cart.quantity,
+        Products.Product_Name, Products.price, Products.picture,
+        (Cart.quantity * Products.price) as total_price
+        FROM Cart
+        JOIN Products ON Cart.product_id = Products.Product_ID
+        WHERE Cart.user_id = %s
+        """
+        cursor.execute(cart_sql, (user_id,))
+        cart_items = cursor.fetchall()
+        
+        subtotal = sum(item['total_price'] for item in cart_items)
+        shipping = 10 if cart_items else 0
+        total = subtotal + shipping
+        
+        for item in cart_items:
+            order_sql = """
+            INSERT INTO Order_info
+            (Cust_ID, Username, Product_ID, Del_address, Del_date, Payment_method, Actions)
+            VALUES (%s, %s, %s, %s, CURDATE(), %s, 'Pending')
+            """
+            cursor.execute(order_sql, (
+                user_id,
+                username,
+                item['product_id'],
+                delivery_address,
+                payment_method
+            ))
+        
+        clear_cart_sql = "DELETE FROM Cart WHERE user_id = %s"
+        cursor.execute(clear_cart_sql, (user_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return redirect(url_for('order_confirmation'))
+    
+    except Exception as e:
+        print(f"Error placing order: {e}")
+        return f"An error occurred while placing the order: {e}", 500
 
+@app.route("/order_confirmation")
+def order_confirmation():
+    if "email" not in session:
+        return redirect(url_for("LOGIN"))
+    
+    try:
+        user_data = Get_userid(session["email"])
+        user_id = user_data['Cust_ID']
 
+        conn = db_connection()
+        cursor = conn.cursor(dictionary=True)
 
+        order_sql = """
+        SELECT oi.Order_ID, oi.Product_ID, p.Product_Name, p.price, 
+               oi.Del_address, oi.Del_date, oi.Payment_method, oi.Actions
+        FROM Order_info oi
+        JOIN Products p ON oi.Product_ID = p.Product_ID
+        WHERE oi.Cust_ID = %s
+        ORDER BY oi.Order_ID DESC
+        """
+        cursor.execute(order_sql, (user_id,))
+        order_details = cursor.fetchall()
+
+        subtotal = sum(item['price'] for item in order_details)
+        shipping = 10 if order_details else 0
+        total = subtotal + shipping
+
+        cursor.close()
+        conn.close()
+
+        return render_template("order_confirmation.html", 
+                               order_details=order_details,
+                               subtotal=subtotal,
+                               shipping=shipping,
+                               total=total)
+
+    except Exception as e:
+        print(f"Error retrieving order confirmation: {e}")
+        return f"An error occurred while retrieving order confirmation: {e}", 500
 
 if __name__ == "__main__":
     app.run(debug = True)

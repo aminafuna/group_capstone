@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Enchanted Petal - Orders</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid pt-5">
+        <div class="text-center mb-4">
+            <h2 class="section-title px-5"><span class="px-2">Orders</span></h2>
+        </div>
+        <div class="row px-xl-5">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="card">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Order Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center mb-0">
+                                <thead class="bg-secondary text-dark">
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Product Name</th>
+                                        <th>Price</th>
+                                        <th>Delivery Address</th>
+                                        <th>Delivery Date</th>
+                                        <th>Payment Method</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in order_details %}
+                                    <tr>
+                                        <td>{{ order.Order_ID }}</td>
+                                        <td>{{ order.Product_Name }}</td>
+                                        <td>${{ order.price }}</td>
+                                        <td>{{ order.Del_address }}</td>
+                                        <td>{{ order.Del_date }}</td>
+                                        <td>{{ order.Payment_method }}</td>
+                                        <td>{{ order.Actions }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer border-secondary bg-transparent">
+                            <div class="d-flex justify-content-between mt-2">
+                                <h5 class="font-weight-bold">Subtotal</h5>
+                                <h5 class="font-weight-bold">${{ subtotal|round(2) }}</h5>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h5 class="font-weight-medium">Shipping</h5>
+                                <h5 class="font-weight-medium">${{ shipping|round(2) }}</h5>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <h5 class="font-weight-bold">Total</h5>
+                                <h5 class="font-weight-bold">${{ total|round(2) }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/user_products" class="btn btn-primary px-4 py-2">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
